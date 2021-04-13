@@ -152,8 +152,10 @@ getdir(struct getdb *db, int *err)
 		      )
 		{
 		next:
-#ifndef	__DragonFly__
+#if !defined(__DragonFly__) && !defined (__CYGWIN__)
 			reclen = db->g_dirp->d_reclen;
+#elif defined (__CYGWIN__)
+			reclen = __builtin_offsetof (struct dirent, d_name) + strlen(db->g_dirp->d_name) + 1;
 #else
 			reclen = _DIRENT_DIRSIZ(db->g_dirp);
 #endif
@@ -183,10 +185,12 @@ getdir(struct getdb *db, int *err)
 	db->g_dic.d_ino = db->g_dirp->d_fileno;
 #endif	/* __FreeBSD__, __NetBSD__, __OpenBSD__, __DragonFly__, __APPLE__ */
 	db->g_dic.d_name = db->g_dirp->d_name;
-#ifndef	__DragonFly__
-		reclen = db->g_dirp->d_reclen;
+#if !defined(__DragonFly__) && !defined (__CYGWIN__)
+	reclen = db->g_dirp->d_reclen;
+#elif defined (__CYGWIN__)
+	reclen = __builtin_offsetof (struct dirent, d_name) + strlen(db->g_dirp->d_name) + 1;
 #else
-		reclen = _DIRENT_DIRSIZ(db->g_dirp);
+	reclen = _DIRENT_DIRSIZ(db->g_dirp);
 #endif
 	if ((db->g_num -= reclen) == 0 || reclen == 0)
 		db->g_dirp = NULL;
