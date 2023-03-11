@@ -20,7 +20,7 @@ if test -x nawk/awk
 then
 	awk=nawk/awk
 else
-	awk=nawk
+	awk=awk
 fi
 
 $awk '
